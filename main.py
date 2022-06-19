@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.properties import ObjectProperty, NumericProperty, ListProperty, BooleanProperty
+from kivy.properties import ObjectProperty, NumericProperty, ListProperty, \
+    BooleanProperty, OptionProperty, ReferenceListProperty
 
 
 class Playground(Widget):
@@ -31,11 +32,29 @@ class Snake(Widget):
 
 
 class SnakeHead(Widget):
-    pass
+    # Направление головы и координаты
+    direction = OptionProperty(
+        'Right', options=['Up', 'Down', 'Left', 'Right']
+    )
+    x_pos = NumericProperty(0)
+    y_pos = NumericProperty(0)
+    pos = ReferenceListProperty(x_pos, y_pos)
+
+    # Отображение на холсте
+    points = ListProperty([0] * 6)
+    object_on_board = ObjectProperty(None)
+    state = BooleanProperty(False)
 
 
 class SnakeTail(Widget):
-    pass
+    # Длина хвоста
+    size = NumericProperty(3)
+
+    # Переменная для хранения позиций блоков
+    blocks_positions = ListProperty()
+
+    # Переменная для хранения объектов хвоста
+    tail_blocks_objects = ListProperty()
 
 
 class SnakeApp(App):
