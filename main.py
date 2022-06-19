@@ -64,9 +64,11 @@ class SnakeTail(Widget):
 
 
 class SnakeApp(App):
+    game_engine = ObjectProperty(None)
+
     def build(self):
-        game = Playground()
-        return game
+        self.game_engine = Playground()
+        return self.game_engine
 
 
 if __name__ == '__main__':

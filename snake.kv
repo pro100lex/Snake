@@ -4,9 +4,19 @@
 
     Snake:
         id: snake_id
+        width: root.width/root.col_numb
+        height: root.height/root.row_numb
 
     Fruit:
         id: fruit_id
+        width: root.width/root.col_numb
+        height: root.height/root.row_numb
+
+    Label:
+        font_size: 70
+        center_x: root.x + root.width/root.col_numb * 2
+        top: root.top - root.height/root.row_numb
+        text: str(root.score)
 
 <Snake>
     head: snake_head_id
@@ -14,6 +24,10 @@
 
     SnakeHead:
         id: snake_head_id
+        width: root.width
+        height: root.height
 
     SnakeTail:
         id: snake_tail_id
+        width: root.width
+        height: root.height
