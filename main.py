@@ -23,7 +23,13 @@ class Playground(Widget):
 
 
 class Fruit(Widget):
-    pass
+    # Длительность существования и продолжительность отсутствия
+    duration = NumericProperty(10)
+    interval = NumericProperty(3)
+
+    # Отображение на поле
+    object_on_board = ObjectProperty(None)
+    state = BooleanProperty(False)
 
 
 class Snake(Widget):
