@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty, NumericProperty, ListProperty, \
     BooleanProperty, OptionProperty, ReferenceListProperty
-from kivy.graphics import Rectangle, Triangle
+from kivy.graphics import Rectangle, Triangle, Ellipse
 
 
 class Playground(Widget):
@@ -31,6 +31,29 @@ class Fruit(Widget):
     # Отображение на поле
     object_on_board = ObjectProperty(None)
     state = BooleanProperty(False)
+
+    def is_on_board(self):
+        return self.state
+
+    def remove(self, *args):
+        # Удаление объекта с поля
+        if self.is_on_board():
+            self.canvas.remove(self.object_on_board)
+            self.object_on_board = ObjectProperty(None)
+            self.state = False
+
+    def pop(self, pos):
+        # Объявление, что фрукт на поле
+        self.pos = pos
+
+        # Отрисовка фрукта
+        with self.canvas:
+            x = (pos[0] - 1) * self.size[0]
+            y = (pos[1] - 1) * self.size[1]
+            coord = (x, y)
+
+            self.object_on_board = Ellipse(pos=coord, size=self.size)
+            self.state = True
 
 
 class Snake(Widget):
