@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty, NumericProperty, ListProperty, \
     BooleanProperty, OptionProperty, ReferenceListProperty
-from kivy.graphics import Rectangle
+from kivy.graphics import Rectangle, Triangle
 
 
 class Playground(Widget):
@@ -87,6 +87,79 @@ class SnakeHead(Widget):
     points = ListProperty([0] * 6)
     object_on_board = ObjectProperty(None)
     state = BooleanProperty(False)
+
+    def is_on_board(self):
+        return self.state
+
+    def remove(self):
+        if self.is_on_board():
+            self.canvas.remove(self.object_on_board)
+            self.object_on_board = ObjectProperty(None)
+            self.state = False
+
+    def show(self):
+        """
+            Отображение головы на холсте
+        """
+        with self.canvas:
+            if not self.is_on_board():
+                self.object_on_board = Triangle(points=self.points)
+                self.state = True
+            else:
+                self.canvas.remove(self.object_on_board)
+                self.object_on_board = Triangle(points=self.points)
+
+    def move(self):
+        """
+            Отображение треугольника для каждого положения головы.
+        """
+        if self.direction == 'Right':
+            # Обновление позиции
+            self.pos[0] += 1
+
+            # Вычисление положения точек
+            x0 = self.pos[0] * self.width
+            y0 = (self.pos[1] - 0.5) * self.height
+            x1 = x0 - self.width
+            y1 = y0 + self.height / 2
+            x2 = x0 - self.width
+            y2 = y0 - self.height / 2
+
+        elif self.direction == "Left":
+            # Обновление позиции
+            self.position[0] -= 1
+
+            # Вычисление положения точек
+            x0 = (self.position[0] - 1) * self.width
+            y0 = (self.position[1] - 0.5) * self.height
+            x1 = x0 + self.width
+            y1 = y0 - self.height / 2
+            x2 = x0 + self.width
+            y2 = y0 + self.height / 2
+
+        elif self.direction == "Up":
+            # Обновление позиции
+            self.position[1] += 1
+
+            # Вычисление положения точек
+            x0 = (self.position[0] - 0.5) * self.width
+            y0 = self.position[1] * self.height
+            x1 = x0 - self.width / 2
+            y1 = y0 - self.height
+            x2 = x0 + self.width / 2
+            y2 = y0 - self.height
+
+        elif self.direction == "Down":
+            # Обновление позиции
+            self.position[1] -= 1
+
+            # Вычисление положения точек
+            x0 = (self.position[0] - 0.5) * self.width
+            y0 = (self.position[1] - 1) * self.height
+            x1 = x0 + self.width / 2
+            y1 = y0 + self.height
+            x2 = x0 - self.width / 2
+            y2 = y0 + self.height
 
 
 class SnakeTail(Widget):
