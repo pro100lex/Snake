@@ -3,6 +3,8 @@ from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty, NumericProperty, ListProperty, \
     BooleanProperty, OptionProperty, ReferenceListProperty
 from kivy.graphics import Rectangle, Triangle, Ellipse
+from random import randint
+from kivy.vector import Vector
 
 
 class Playground(Widget):
@@ -21,6 +23,125 @@ class Playground(Widget):
     # Обработка входных данных
     touch_start_pos = ListProperty()
     action_triggered = BooleanProperty(False)
+
+    def start(self):
+        # Добавление змейки
+        self.new_snake()
+
+        # Цикл обновления игры
+        self.update()
+
+    def reset(self):
+        # Сброс игровых переменных
+        self.turn_counter = 0
+        self.score = 0
+
+        # Удаление змейки и фруктов с поля
+        self.snake.remove()
+        self.fruit.remove()
+
+    def new_snake(self):
+        # Генерация случайных координат
+        start_coord = (
+            randint(2, self.col_numb - 2), randint(2, self.row_numb - 2)
+        )
+
+        # Установка координат для змейки
+        self.snake.set_position(start_coord)
+
+        # Генерация случайного направления
+        rand_ind = randint(0, 3)
+        start_direction = ['Up', 'Down', 'Left', 'Right'][rand_ind]
+
+        # Установка направления для змейки
+        self.snake.set_direction(start_direction)
+
+    def pop_fruit(self, *args):
+        # Генерация случайных координат для фрукта
+        random_coord = [
+            randint(1, self.col_numb), randint(1, self.row_numb)
+        ]
+
+        # Получение координат клеток, которые занимает змейка
+        snake_space = self.snake.get_full_position()
+
+        # Если координаты совпадают, то генерируются новые
+        while random_coord in snake_space:
+            random_coord = [
+                randint(1, self.col_numb), randint(1, self.row_numb)
+            ]
+
+        # Отображение фрукта на поле
+        self.fruit.pop(random_coord)
+
+    def is_defeated(self):
+        """
+            Проверка позиции змеи на проигрыш
+        """
+        snake_position = self.snake.get_position()
+
+        # Проверка на кусание головой хвоста
+        if snake_position in self.snake.tail.blocks_positions:
+            return True
+
+        # Проверка на выход за пределы поля
+        if snake_position[0] > self.col_numb\
+                or snake_position[0] < 1\
+                or snake_position[1] > self.row_numb\
+                or snake_position[1] < 1:
+            return True
+
+        return False
+
+    def update(self, *args):
+        """
+            Смена игровых ходов
+        """
+        # Перемещение змейки на следующую позицию
+        self.snake.move()
+
+        # Проверка на поражение
+        if self.is_defeated():
+            self.reset()
+            self.start()
+            return
+
+        # Проверка на нахождении фрукта на поле
+        if self.fruit.is_on_board():
+            # Если змейка съела фрукт, то увеличиваем счетчик
+            if self.snake.get_pos() == self.fruit.pos:
+                self.fruit.remove()
+                self.score += 1
+                self.snake.tail.size += 1
+
+        # Увеличение счетчика ходов
+        self.turn_counter += 1
+
+    def on_touch_down(self, touch):
+        self.touch_start_pos = touch.spos
+
+    def on_touch_move(self, touch):
+        # Вычисление изменения позиции пальца
+        delta = Vector(*touch.spos) - Vector(*self.touch_start_pos)
+
+        if not self.action_triggered \
+                and (abs(delta[0]) > 0.1 or abs(delta[1]) > 0.1):
+            if abs(delta[0]) > abs(delta[1]):
+                if delta[0] > 0:
+                    self.snake.set_direction('Right')
+                else:
+                    self.snake.set_direction('Left')
+            else:
+                if delta[1] > 0:
+                    self.snake.set_direction('Up')
+                else:
+                    self.snake.set_direction('Down')
+            # Регистрация, что действие закончено
+            self.action_triggered = True
+
+    def on_touch_up(self, touch):
+        # Объявление готовности выполнять новые инструкции
+        self.action_triggered = False
 
 
 class Fruit(Widget):
